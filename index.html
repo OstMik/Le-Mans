@@ -1,26 +1,562 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Mans</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Mans — Guide de la Cité Plantagenêt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1208;
+      --parchment: #f5efe3;
+      --parchment-dark: #e8dfc8;
+      --gold: #b5892a;
+      --gold-light: #d4a847;
+      --rust: #8b3a2a;
+      --stone: #7a6e5f;
+      --accent: #3d2b1f;
+      --river: #2a4a5e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--parchment);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+      background: var(--accent);
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(181,137,42,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(139,58,42,0.2) 0%, transparent 50%);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L35 20 L50 20 L38 30 L43 45 L30 35 L17 45 L22 30 L10 20 L25 20 Z' fill='none' stroke='rgba(181,137,42,0.06)' stroke-width='1'/%3E%3C/svg%3E") repeat;
+      opacity: 0.4;
+    }
+
+    .hero-ornament { font-size: 48px; color: var(--gold); margin-bottom: 20px; letter-spacing: 20px; animation: fadeDown 1.2s ease both; }
+    .hero-subtitle { font-size: 13px; letter-spacing: 6px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 24px; animation: fadeDown 1.2s 0.2s ease both; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(52px, 10vw, 100px); font-weight: 700; color: var(--parchment); line-height: 1.0; margin-bottom: 16px; animation: fadeDown 1.2s 0.3s ease both; }
+    .hero h1 em { font-style: italic; color: var(--gold-light); }
+    .hero-desc { font-size: 20px; font-style: italic; color: rgba(245,239,227,0.7); max-width: 560px; margin: 20px auto 40px; animation: fadeDown 1.2s 0.5s ease both; }
+    .hero-divider { width: 120px; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); margin: 0 auto 30px; animation: fadeIn 1.5s 0.7s ease both; }
+    .hero-count { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: rgba(245,239,227,0.5); animation: fadeIn 1.5s 0.9s ease both; }
+    .scroll-hint { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); color: var(--gold); font-size: 24px; animation: bounce 2s ease infinite; opacity: 0.7; }
+
+    @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .intro { max-width: 780px; margin: 80px auto; padding: 0 40px; text-align: center; }
+    .intro p { font-size: 21px; font-style: italic; color: var(--stone); line-height: 1.9; }
+    .intro-rule { display: flex; align-items: center; gap: 20px; margin: 50px 0; }
+    .intro-rule hr { flex: 1; border: none; border-top: 1px solid var(--gold); opacity: 0.4; }
+    .intro-rule span { color: var(--gold); font-size: 22px; }
+
+    .places { max-width: 960px; margin: 0 auto 100px; padding: 0 40px; }
+
+    .place-card { display: grid; grid-template-columns: 80px 1fr; gap: 0 40px; margin-bottom: 70px; opacity: 0; animation: slideUp 0.7s ease forwards; }
+    .place-card:nth-child(1) { animation-delay: 0.05s; }
+    .place-card:nth-child(2) { animation-delay: 0.15s; }
+    .place-card:nth-child(3) { animation-delay: 0.2s; }
+    .place-card:nth-child(4) { animation-delay: 0.25s; }
+    .place-card:nth-child(5) { animation-delay: 0.3s; }
+    .place-card:nth-child(6) { animation-delay: 0.35s; }
+    .place-card:nth-child(7) { animation-delay: 0.4s; }
+    .place-card:nth-child(8) { animation-delay: 0.45s; }
+    .place-card:nth-child(9) { animation-delay: 0.5s; }
+    .place-card:nth-child(10) { animation-delay: 0.55s; }
+    .place-card:nth-child(11) { animation-delay: 0.6s; }
+    .place-card:nth-child(12) { animation-delay: 0.65s; }
+    .place-card:nth-child(13) { animation-delay: 0.7s; }
+
+    .place-number { text-align: right; padding-top: 6px; }
+    .place-number span { font-family: 'Playfair Display', serif; font-size: 52px; font-style: italic; color: var(--gold); opacity: 0.35; line-height: 1; }
+    .place-content { border-left: 1px solid var(--parchment-dark); padding-left: 40px; }
+    .place-era { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--rust); margin-bottom: 8px; }
+    .place-name { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; line-height: 1.2; color: var(--ink); margin-bottom: 4px; }
+    .place-alias { font-size: 15px; font-style: italic; color: var(--stone); margin-bottom: 16px; }
+    .place-body { font-size: 17px; color: #3a3020; line-height: 1.85; margin-bottom: 18px; }
+    .place-anecdote { background: var(--parchment-dark); border-left: 3px solid var(--gold); padding: 16px 22px; font-size: 16px; font-style: italic; color: var(--stone); line-height: 1.7; margin-bottom: 18px; }
+    .place-link { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .place-link:hover { border-bottom-color: var(--gold); }
+
+    /* PROMENADE */
+    .promenade-interlude {
+      background: var(--river);
+      background-image:
+        radial-gradient(ellipse at 20% 70%, rgba(80,150,190,0.2) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 15%, rgba(10,45,75,0.5) 0%, transparent 50%);
+      /* Break out of the .places padding to go full-width */
+      margin-left: -40px;
+      margin-right: -40px;
+      margin-bottom: 70px;
+      padding: 60px 40px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Inner content constrained to same max-width as cards */
+    .promenade-inner {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    .promenade-interlude::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, rgba(120,210,245,0.35), transparent);
+    }
+
+    .promenade-interlude::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, rgba(120,210,245,0.35), transparent);
+    }
+
+    .promenade-wave {
+      font-size: 22px;
+      color: rgba(100,190,230,0.2);
+      letter-spacing: 6px;
+      margin-bottom: 20px;
+    }
+
+    .promenade-label {
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(160,215,240,0.75);
+      margin-bottom: 12px;
+    }
+
+    .promenade-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-style: italic;
+      color: #eaf5fb;
+      margin-bottom: 24px;
+      line-height: 1.3;
+    }
+
+    .promenade-body {
+      font-size: 17.5px;
+      color: rgba(225,243,252,0.88);
+      line-height: 1.95;
+      margin-bottom: 40px;
+      max-width: 780px;
+    }
+
+    .promenade-body strong {
+      color: #b8e4f5;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .bridges-title {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(160,215,240,0.55);
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .bridges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    .bridge {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 2px solid rgba(120,200,235,0.3);
+      padding: 24px 26px 22px;
+    }
+
+    .bridge-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #daf0fb;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .bridge-desc {
+      font-size: 15px;
+      color: rgba(200,233,247,0.82);
+      line-height: 1.75;
+      font-style: normal;
+    }
+
+    .section-sep { display: flex; align-items: center; gap: 16px; max-width: 960px; margin: 0 auto 60px; padding: 0 40px; }
+    .section-sep hr { flex: 1; border: none; border-top: 1px solid var(--parchment-dark); }
+    .section-sep .diamond { color: var(--gold); font-size: 10px; opacity: 0.6; }
+
+    footer { background: var(--accent); color: rgba(245,239,227,0.5); text-align: center; padding: 60px 40px; font-size: 14px; font-style: italic; letter-spacing: 1px; }
+    footer strong { color: var(--gold-light); font-style: normal; }
+
+    @media (max-width: 700px) {
+      .place-card { grid-template-columns: 1fr; }
+      .place-number { text-align: left; }
+      .place-content { border-left: none; border-top: 1px solid var(--parchment-dark); padding-left: 0; padding-top: 20px; }
+      .hero h1 { font-size: 52px; }
+      .promenade-interlude { margin-left: -20px; margin-right: -20px; padding: 40px 24px 34px; }
+      .bridges { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Le Mans</h1>
-    </header>
-    <main>
-        <section>
-            <h2>About the Race</h2>
-            <p>The Le Mans race is one of the most prestigious motorsport events in the world.</p>
-        </section>
-        <section class="promenade-interlude">
-            <h2>Promenade Interlude</h2>
-            <p>This section highlights the moments of the promenade during the race.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 Le Mans. All rights reserved.</p>
-    </footer>
+
+<section class="hero">
+  <div class="hero-ornament">⚜</div>
+  <div class="hero-subtitle">Guide de la Cité Plantagenêt</div>
+  <h1>Le <em>Mans</em></h1>
+  <div class="hero-desc">Un circuit à pied de trois kilomètres pour traverser vingt siècles d'histoire dans la plus belle cité médiévale de France.</div>
+  <div class="hero-divider"></div>
+  <div class="hero-count">XIV étapes · ~3,5 km · 2–3 heures de promenade</div>
+  <div class="scroll-hint">↓</div>
+</section>
+
+<div class="intro">
+  <p>Derrière les pistes du circuit automobile le plus célèbre du monde se cache une ville que peu connaissent vraiment : une cité gallo-romaine, médiévale et Renaissance d'une rare cohérence, lovée dans ses remparts antiques au-dessus de la Sarthe. Ce circuit débute au bord de l'eau et monte, pierre par pierre, vers le sommet de la cité historique.</p>
+  <div class="intro-rule"><hr><span>✦</span><hr></div>
+</div>
+
+<div class="places">
+
+  <!-- 1 -->
+  <div class="place-card">
+    <div class="place-number"><span>1</span></div>
+    <div class="place-content">
+      <div class="place-era">1920 · Bord de Sarthe · Départ</div>
+      <div class="place-name">Statue de Wilbur Wright</div>
+      <div class="place-alias">Œuvre de Paul Landowski · Boulevard Anatole France</div>
+      <div class="place-body">
+        Commencez au bord de la Sarthe face à ce monument inauguré en 1920 en hommage au premier vol d'aéroplane en Europe, accompli ici même par Wilbur Wright en août 1908, sur invitation de l'industriel manceau Léon Bollée. L'œuvre est signée Paul Landowski (1875–1961) — le sculpteur du Christ du Corcovado à Rio de Janeiro.
+      </div>
+      <div class="place-anecdote">
+        Le piédestal porte en bas-relief les portraits des frères Wilbur et Orville Wright ainsi que de Léon Bollée. Une figure allégorique de la Victoire s'appuie sur la base, les bras tendus vers le ciel — comme pour imiter l'avion disparu.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Statue+Wilbur+Wright+de+Paul+Landowski/data=!4m2!3m1!1s0x47e288cb297dc0d1:0xe349cc9a5c8bfd08" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <!-- PROMENADE -->
+  <div class="promenade-interlude">
+    <div class="promenade-inner">
+      <div class="promenade-wave">〰 〰 〰 〰 〰 〰 〰 〰 〰 〰</div>
+      <div class="promenade-label">🚶 Promenade le long de la Sarthe · ~700 m vers le nord</div>
+      <div class="promenade-title">Le plus beau panorama sur le vieux Mans s'offre ici</div>
+      <div class="promenade-body">
+        En longeant la rive droite de la Sarthe depuis la statue vers Notre-Dame-du-Pré, vous bénéficiez du panorama le plus saisissant sur la cité : les remparts gallo-romains s'élèvent au-dessus du fleuve sur plus de quinze mètres de hauteur, couronnés par la silhouette de la cathédrale Saint-Julien. Ce spectacle, immuable depuis des siècles, est le meilleur argument pour prendre le temps de longer l'eau plutôt que de couper à travers la ville.
+        <br><br>
+        Parfois, tout près du bord de l'eau, un autre pan de mur vous interpelle : ce sont les vestiges de l'<strong>Enceinte des Tanneries</strong>, la muraille médiévale du quartier des corroyeurs. Au début de la guerre de Cent Ans, face à la menace anglaise, la vieille enceinte romaine fut jugée insuffisante — et ce faubourg artisanal, vital pour l'économie de la ville, reçut sa propre fortification. Les tanneurs s'étaient installés ici précisément parce que leur métier exigeait de l'eau en abondance ; leurs maisons et leurs ateliers occupaient la bande de terre entre la Sarthe et le mur romain. Ces fragments de mur longeant la berge sont l'un des rares témoins bien lisibles des fortifications médiévales suburbaines du Mans.
+      </div>
+      <div class="bridges-title">Trois ponts · trois siècles d'histoire</div>
+      <div class="bridges">
+        <div class="bridge">
+          <div class="bridge-name">Pont Gambetta</div>
+          <div class="bridge-desc">Ouvert en 1811 comme « Pont Royal », c'est lui qui sonna le glas du vieux pont Perrin, désormais concurrencé et condamné à disparaître. Il reste aujourd'hui l'axe principal de traversée de la ville.</div>
+        </div>
+        <div class="bridge">
+          <div class="bridge-name">Pont Perrin</div>
+          <div class="bridge-desc">Fondé en 994, ce pont médiéval fut pendant des siècles le seul passage pour les voitures entre la Normandie et la Bretagne. Il portait des maisons et des boutiques de chaque côté, comme le pont au Change à Paris. Le 12 décembre 1793, les derniers Vendéens épuisés le traversèrent en retraite, fuyant les armées républicaines. Jugé trop coûteux à entretenir après l'ouverture du pont Gambetta, il fut démoli à l'été 1881 — ce que les contemporains vécurent comme une perte irréparable, sans raison valable. Le pont actuel date de 1977.</div>
+        </div>
+        <div class="bridge">
+          <div class="bridge-name">Pont Yssoir</div>
+          <div class="bridge-desc">Attestée dès l'époque gallo-romaine (Ier–IIe s.), cette traversée fut reconstruite en pierre vers 1560. En 1898, l'ingénieur Arel de La Noë y adjoignit un pont métallique en forme de « X » — star des cartes postales d'époque — pour desservir simultanément tramways à vapeur et électriques. Le 8 août 1944, les Allemands en retraite firent sauter les deux ouvrages. Le pont actuel, en béton, date des années 1970 — mais depuis sa rambarde, le panorama sur la cathédrale Saint-Julien et les remparts gallo-romains reste l'un des plus célèbres de la ville.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 2 -->
+  <div class="place-card">
+    <div class="place-number"><span>2</span></div>
+    <div class="place-content">
+      <div class="place-era">XIe–XIIe siècle · Abbaye bénédictine</div>
+      <div class="place-name">Église Notre-Dame-du-Pré</div>
+      <div class="place-alias">Ancienne chapelle de l'abbaye Saint-Julien-du-Pré</div>
+      <div class="place-body">
+        En arrivant depuis la promenade des bords de Sarthe, cette église romane s'offre comme une première révélation. Construite aux XIe et XIIe siècles, elle est un témoignage exceptionnel du roman manceau : plan en croix latine, système tripartite de nef, faux triforium et arcades aveugles des collatéraux — tout révèle l'influence directe de la cathédrale Saint-Julien toute proche. Son austérité de calcaire blond contraste saisissamment avec l'exubérance gothique que vous découvrirez plus haut.
+      </div>
+      <div class="place-anecdote">
+        Fondée à l'emplacement supposé de la sépulture du saint, l'abbaye fut en grande partie détruite pendant la Révolution. L'église a survécu — et ses vitraux du XXe siècle signés Max Ingrand baignent l'intérieur d'une lumière bleue et dorée qui, après la lumière crue de la rivière, saisit à coup sûr le visiteur.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Church+of+Notre-Dame-du-Pr%C3%A9/data=!4m2!3m1!1s0x47e288cf49b257ed:0xe494f8875b389cae" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 3 -->
+  <div class="place-card">
+    <div class="place-number"><span>3</span></div>
+    <div class="place-content">
+      <div class="place-era">Époque romaine · Enceinte gallo-romaine</div>
+      <div class="place-name">Escalier des Pans-de-Goron</div>
+      <div class="place-alias">L'ancienne poterne romaine</div>
+      <div class="place-body">
+        Depuis Notre-Dame-du-Pré, remontez vers la cité haute par cet escalier qui emprunte une ancienne poterne — une ouverture discrète percée dans le mur romain pour faciliter l'accès à la rivière. Le mot <em>pan</em> désigne la pente escarpée ; <em>Goron</em> serait le nom d'une bourgade du Bas-Maine vers laquelle menait ce chemin.
+      </div>
+      <div class="place-anecdote">
+        En montant, vous longez les murs vénérables de l'hôtel Saint-Pierre avec ses fenêtres romanes des XIe–XIIe siècles. Un moment suspendu entre ciel et fleuve, entre Antiquité et Moyen Âge.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Escalier+des+Pans-de-Goron/data=!4m2!3m1!1s0x47e288d01eaa691f:0x75b80949c68a5f3" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 4 -->
+  <div class="place-card">
+    <div class="place-number"><span>4</span></div>
+    <div class="place-content">
+      <div class="place-era">1520 · Renaissance · Évêché</div>
+      <div class="place-name">Palais du Grabatoire</div>
+      <div class="place-alias">Palais des gouverneurs du Maine · Place du Cardinal Grente</div>
+      <div class="place-body">
+        Avec ses toits aigus, ses angles soulignés, ses fenêtres finement travaillées et ses deux tourelles à pans coupés, le Grabatoire est l'un des plus beaux exemples de la Renaissance mancelle. Construit en 1520 par Jean de Courtardy, archidiacre de Montfort, il accueille depuis 1907 l'évêché du Mans.
+      </div>
+      <div class="place-anecdote">
+        Son nom énigmatique vient du latin <em>grabatarius</em> : il désignait à l'origine le bâtiment où vivaient les chanoines infirmes et malades. Une étymologie qui contraste singulièrement avec l'élégance de sa façade.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Palais+du+Grabatoire/data=!4m2!3m1!1s0x47e288d019d960b3:0x54a524f5e26fd633" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 5 -->
+  <div class="place-card">
+    <div class="place-number"><span>5</span></div>
+    <div class="place-content">
+      <div class="place-era">XIIe–XVe siècle · Place Saint-Michel</div>
+      <div class="place-name">Maison Scarron</div>
+      <div class="place-alias">Maison des Livraires · 1, place Saint-Michel</div>
+      <div class="place-body">
+        En face du portail méridional de la cathédrale se dresse cette maison d'origine romane, probablement remaniée à la fin du XIIIe siècle, aux belles voûtes gothiques en crypte. C'est ici qu'aurait séjourné Paul Scarron lors de ses séjours au Mans, lui que l'évêque Charles de la Vardin avait pris à son service en 1633.
+      </div>
+      <div class="place-anecdote">
+        En regardant de près le premier corps de logis (XVe siècle), on distingue la figure d'un bouffon tranquillement assis à l'extrémité de la souche de toiture — un clin d'œil ironique qui semble avoir été placé là exprès pour évoquer l'hôte le plus célèbre de la maison. Ce même Scarron, paralysé par un rhumatisme chronique qui le faisait souffrir depuis ses 28 ans, épousa Françoise d'Aubigné — la future Mme de Maintenon, secrète épouse de Louis XIV. Il composa sa propre épitaphe : <em>« Passant, ne fais pas de bruit... c'est la première nuit que le pauvre Scarron dort. »</em>
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Maison+Scarron/data=!4m2!3m1!1s0x47e289ace2ba6df9:0x39d29cf87344754a" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 6 -->
+  <div class="place-card">
+    <div class="place-number"><span>6</span></div>
+    <div class="place-content">
+      <div class="place-era">1853 · Néo-gothique</div>
+      <div class="place-name">Escalier du Jet d'Eau</div>
+      <div class="place-alias">Entre la cathédrale et la place des Jacobins</div>
+      <div class="place-body">
+        Aménagé en 1853 pour relier l'ancien centre dense au nouveau quartier des Jacobins, cet escalier à double volée et balustrade néo-gothique est l'œuvre de Jean-Baptiste Lassus (1807–1857), l'architecte qui restaura la Sainte-Chapelle à Paris. À son pied, un bassin circulaire accueille une fontaine en fonte à deux vasques superposées, surmontée d'un pinacle.
+      </div>
+      <div class="place-anecdote">
+        C'est ce jet d'eau qui a donné son nom au lieu — et qui reste aujourd'hui un rendez-vous tranquille pour contempler la cité haute, avant de plonger dans ses ruelles médiévales.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Esc.+du+Jet+d'Eau/data=!4m2!3m1!1s0x47e288d049c4ebc9:0x47fc1e4a548b1a58" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 7 -->
+  <div class="place-card">
+    <div class="place-number"><span>7</span></div>
+    <div class="place-content">
+      <div class="place-era">XVe siècle · Rue de la Reine Bérengère</div>
+      <div class="place-name">Maison des Deux Amis</div>
+      <div class="place-alias">18–20, rue de la Reine Bérengère</div>
+      <div class="place-body">
+        Le plus grand édifice à colombages conservé du Mans. Sa façade s'élève sur deux étages en encorbellement, coiffés d'un étage de comble. Au centre, une sculpture sur le poteau central représente deux hommes se tenant la main, chacun regardant vers sa porte. Leurs vêtements trahissent des conditions sociales différentes — et pourtant les voilà, bâtissant ensemble ces maisons jumelles.
+      </div>
+      <div class="place-anecdote">
+        À l'arrière, une tourelle à pans coupés dissimule l'unique escalier en pierre, qui dessert les deux logis. Un rare témoignage de fraternité médiévale gravé dans le chêne.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/20+Rue+de+la+Reine+B%C3%A9reng%C3%A8re/data=!4m2!3m1!1s0x47e288d02861e147:0xecacf38a96ff560a" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 8 -->
+  <div class="place-card">
+    <div class="place-number"><span>8</span></div>
+    <div class="place-content">
+      <div class="place-era">Fin XVe siècle · Rue de la Reine Bérengère</div>
+      <div class="place-name">Maison de la Reine Bérengère</div>
+      <div class="place-alias">7, rue de la Reine Bérengère · En face de la Maison des Deux Amis</div>
+      <div class="place-body">
+        La rue porte le nom de Bérengère de Navarre, épouse de Richard Cœur de Lion, qui s'établit au Mans après la mort du roi en 1199 et y mourut en 1230 — fondant au passage l'abbaye de l'Épau à l'est de la ville, où elle repose toujours. Mais attention : la maison qui porte son nom fut construite à la fin du XVe siècle, soit plus de deux cents ans après sa mort. La reine n'y a jamais habité. Le nom est une attribution romantique, pas un fait historique. L'édifice n'en reste pas moins exceptionnel : trois étages en encorbellement s'élèvent sur un rez-de-chaussée en pierre percé d'un beau portail gothique à arc en accolade, orné de pinacles et d'un décor végétal à crochets. La façade à pans de bois du premier étage déploie une riche composition en croix de Saint-André, reposant sur une sablière sculptée de marmousets — ces figures grotesques typiques du gothique tardif. Quatre statuettes de bourgeois en longues robes, tenant des phylactères, ornent le sommet de certains poteaux.
+      </div>
+      <div class="place-anecdote">
+        Bérengère reste la seule reine d'Angleterre à n'avoir jamais mis les pieds en Angleterre. Épousée à Chypre en 1191 lors de la Troisième Croisade, elle suivit Richard en Terre Sainte mais ne franchit jamais la Manche. La maison voisine au nº 24 — hôtel Amellon de Saint-Cher — offre un beau contraste : c'est un spécimen élégant de l'architecture classique du XVIIe siècle, et le nº 21 présente un autre remarquable colombage du XVe siècle.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/search/7+rue+de+la+Reine+B%C3%A9reng%C3%A8re+Le+Mans" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 9 -->
+  <div class="place-card">
+    <div class="place-number"><span>9</span></div>
+    <div class="place-content">
+      <div class="place-era">XVe–XVIe siècle · Grand'Rue</div>
+      <div class="place-name">Maison du Pilier Rouge</div>
+      <div class="place-alias">Angle de la Grand'Rue et de la rue du Pilier Rouge</div>
+      <div class="place-body">
+        Cette maison — en réalité un ensemble de trois bâtiments groupés autour d'un poteau cornier — doit son nom à la couleur rouge sang de cet angle sculpté. La légende populaire en fit jadis la demeure du bourreau de la ville, mais c'est une erreur : le bourreau ne pouvait résider en ville, jugé trop « impur ». En réalité, ces poteaux peints servaient d'enseignes et de repères dans les ruelles du vieux Mans. La capitale de la colonne est ornée d'un crâne, d'un crucifix et d'une crosse de soule — la crosse utilisée dans ce sport médiéval à mi-chemin entre le hockey et le rugby. La maison était vraisemblablement la boutique d'un <em>palmier</em>, artisan fabricant de balles et crosses de soule ainsi que de raquettes de paume.
+      </div>
+      <div class="place-anecdote">
+        On recense encore une dizaine de ces poteaux corniers sculptés dans le vieux Mans. Au printemps 2004, l'un d'eux, finement ouvragé, fut découvert par hasard lors de la rénovation d'une ancienne épicerie transformée en café, rue du Pré. Les trois bâtiments du Pilier Rouge, propriété de la ville, ont été entièrement restaurés et accueillent aujourd'hui expositions et manifestations culturelles.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Maison+du+Pilier+rouge/data=!4m2!3m1!1s0x47e288ce2ae70ac3:0x149f392c113aba05" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 10 -->
+  <div class="place-card">
+    <div class="place-number"><span>10</span></div>
+    <div class="place-content">
+      <div class="place-era">1877 · Infrastructure · Grand'Rue</div>
+      <div class="place-name">Tunnel Wilbur Wright</div>
+      <div class="place-alias">Entre la Grand'Rue et la place des Jacobins</div>
+      <div class="place-body">
+        La colline du vieux Mans a longtemps coupé la ville en deux. De 1851 à 1857, une galerie souterraine étroite et dangereuse permettait aux piétons de la franchir. En 1869, l'ingénieur Eugène Caillault conçut une tranchée de 10 mètres de large et 200 mètres de long — dont 75 mètres couverts — qui nécessita la démolition de nombreuses maisons anciennes. Ouvert en 1877, ce tunnel devint une véritable rue commerçante, ses niches latérales abritant des boutiques. Il porte aujourd'hui le nom de Wilbur Wright en hommage au pionnier de l'aviation qui triompha au Mans en 1908.
+      </div>
+      <div class="place-anecdote">
+        Rénové en 2002 — avec une piste cyclable à monte-charge, des compositions florales et des panneaux peints dans les anciennes niches de boutiques — le tunnel a retrouvé une vie inattendue. En 2007, le sculpteur Kaspar Schläpfer y installa des œuvres permanentes qui dialoguent avec la pierre. Un passage à ne pas esquiver : c'est l'un des rares endroits de France où l'on traverse littéralement une colline médiévale.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Tunnel+Wilbur+Wright/data=!4m2!3m1!1s0x47e2890061c0d29f:0xbc4e3ec1f844ce35" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 11 -->
+  <div class="place-card">
+    <div class="place-number"><span>11</span></div>
+    <div class="place-content">
+      <div class="place-era">Xe – XIIIe siècle · Hôtel de ville</div>
+      <div class="place-name">Palais Plantagenêt</div>
+      <div class="place-alias">Palais des comtes du Maine · Palais royal</div>
+      <div class="place-body">
+        C'est ici que bat le cœur historique du pouvoir. Construit entre 1126 et 1230, le Palais Plantagenêt est la résidence des comtes du Maine, ces seigneurs qui allaient devenir rois d'Angleterre. Ses fragments, aujourd'hui intégrés dans le bâtiment de l'hôtel de ville, reposent sur des ruines romaines et prolongent une résidence comtale des Xe–XIe siècles.
+      </div>
+      <div class="place-anecdote">
+        La grande <em>aula</em> — salle de réception noble — témoigne d'une organisation palatiale classique articulée autour de deux pôles : le séculier et le religieux, représentés par la collégiale Saint-Pierre-la-Cour toute proche.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Palais+des+comtes+du+Maine+-+Palais+royal+Plantagen%C3%AAt/data=!4m2!3m1!1s0x47e288d1d7448035:0x967053f41b2ede57" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 9 -->
+  <div class="place-card">
+    <div class="place-number"><span>12</span></div>
+    <div class="place-content">
+      <div class="place-era">1519–1525 · Renaissance · Grand'Rue</div>
+      <div class="place-name">Maison d'Adam et Ève</div>
+      <div class="place-alias">Entre le nº 69 et le nº 75 de la Grand'Rue</div>
+      <div class="place-body">
+        Édifiée pour Jean de l'Épine — médecin et astrologue de Marguerite de Navarre, sœur de François Ier — cette maison entièrement en pierre est la façade du XVIe siècle la plus richement ornementée du Mans. Pilastres sculptés, vases cannelés couronnés de putti, frise de médaillons et scènes mythologiques s'y déploient avec une exubérance toute Renaissance.
+      </div>
+      <div class="place-anecdote">
+        Les scènes sculptées en haut relief — dont les figures qui donnent leur nom à la maison — en font un véritable traité en pierre, à contempler depuis le trottoir d'en face pour en saisir toute la richesse.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Maison+d'Adam+et+%C3%88ve/data=!4m2!3m1!1s0x47e288ce3723c6c1:0xb385930f8a1b26ee" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 10 -->
+  <div class="place-card">
+    <div class="place-number"><span>13</span></div>
+    <div class="place-content">
+      <div class="place-era">Moyen Âge · Rue Saint-Pavin-de-la-Cité</div>
+      <div class="place-name">La Maison suspendue</div>
+      <div class="place-alias">La « maison-pont »</div>
+      <div class="place-body">
+        Cette maison à colombages, jadis recouverte d'ardoise, ne comporte qu'une seule pièce éclairée par deux fenêtres se faisant face. Construite au-dessus de la rue, elle mérite mieux que son surnom de « suspendue » : c'est en réalité une <em>maison-pont</em>, enjambant littéralement la venelle.
+      </div>
+      <div class="place-anecdote">
+        Photographiée par Robert Doisneau et sujet de nombreux peintres et graveurs, elle est l'un des emblèmes du vieux Mans — modeste par sa taille, inoubliable par sa silhouette. Elle se cache à l'entrée de la rue ; c'est dans sa discrétion que réside tout son charme.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/La+Maison+suspendue/data=!4m2!3m1!1s0x47e288ce4bf6629d:0x7c5a13581d2fa1" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+  <div class="section-sep"><hr><span class="diamond">◆</span><hr></div>
+
+  <!-- 11 -->
+  <div class="place-card">
+    <div class="place-number"><span>14</span></div>
+    <div class="place-content">
+      <div class="place-era">XVe–XVIIIe siècle · Grand'Rue · Arrivée</div>
+      <div class="place-name">Cour d'Assé</div>
+      <div class="place-alias">La place secrète du vieux Mans</div>
+      <div class="place-body">
+        À quelques pas de la Maison suspendue, un panneau discret « Cour d'Assé » invite à franchir un passage mystérieux encadré de grandes pierres. Il mène au cœur d'un îlot densément bâti jusqu'à une petite place entourée de maisons élevées entre le XVe et le XVIIIe siècle. Malgré l'hétérogénéité apparente des bâtisses, le lieu dégage une atmosphère unique, accentuée par la restauration soignée de certaines façades et la mise en couleur des colombages. C'est le genre d'endroit que l'on ne montre qu'à ses amis.
+      </div>
+      <div class="place-anecdote">
+        La cour tient son nom des puissants seigneurs d'Assé-le-Riboul qui y tenaient, au Moyen Âge, leurs sessions judiciaires. Aujourd'hui, c'est l'un des endroits les plus photogéniques et les moins fréquentés du vieux Mans. Vous avez parcouru trois kilomètres et vingt siècles — c'est ici que le circuit s'achève, en silence, entre les pierres.
+      </div>
+      <a class="place-link" href="https://www.google.com/maps/place/Cour+d%E2%80%99Ass%C3%A9/data=!4m2!3m1!1s0x47e288ce48b86189:0x6f6fa7c3e018b9b0" target="_blank">Voir sur la carte →</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Guide réalisé à partir d'une sélection de <strong>99 lieux documentés</strong> dans la cité historique du Mans.<br>
+  <em>Toutes les étapes sont reliées à pied en 2 à 3 heures, sans contraintes horaires.</em></p>
+</footer>
+
 </body>
 </html>
